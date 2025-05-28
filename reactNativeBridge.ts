@@ -5,7 +5,7 @@ const registerCallback = <T>(resolve: (value: T) => void, reject: (reason?: any)
   const id = `jsCallBack${cbId++}`
   cbMap.set(id, { resolve, reject })
 
-  document.addEventListener('message', (e) => {
+  const onmessage = (e: Event) => {
     const data = (e as MessageEvent).data
     if (typeof data === 'string') {
       try {
@@ -31,12 +31,14 @@ const registerCallback = <T>(resolve: (value: T) => void, reject: (reason?: any)
             cb.reject(result)
           }
         }
+        document.removeEventListener('message', onmessage)
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         /* empty */
       }
     }
-  })
+  }
+  document.addEventListener('message', onmessage)
 
   return id
 }
