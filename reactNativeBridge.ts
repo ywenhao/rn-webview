@@ -46,7 +46,6 @@ const registerCallback = <T>(resolve: (value: T) => void, reject: (reason?: any)
 }
 
 function invoke(method: string, params?: any) {
-  setupOnmessage()
   // @ts-ignore
   window.ReactNativeWebView.postMessage(JSON.stringify({ method, params }))
 }
