@@ -13,6 +13,7 @@ export default function HomeScreen() {
       source={{ uri: 'http://192.168.60.163:5173' }}
       javaScriptEnabled
       domStorageEnabled
+      mediaPlaybackRequiresUserAction={false}
       onMessage={(event) => {
         const data = JSON.parse(event.nativeEvent.data)
         const method = data.method

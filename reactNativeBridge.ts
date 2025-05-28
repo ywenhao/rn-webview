@@ -1,11 +1,11 @@
 let cbId = 0
 const cbMap = new Map()
 
-const registerCallback = <T>(resolve: (value: T) => void, reject: (reason?: any) => void) => {
-  const id = `jsCallBack${cbId++}`
-  cbMap.set(id, { resolve, reject })
+let onmessageLoaded = false
+const setupOnmessage = () => {
+  if (onmessageLoaded) return
 
-  const onmessage = (e: Event) => {
+  document.addEventListener('message', (e) => {
     const data = (e as MessageEvent).data
     if (typeof data === 'string') {
       try {
@@ -31,24 +31,28 @@ const registerCallback = <T>(resolve: (value: T) => void, reject: (reason?: any)
             cb.reject(result)
           }
         }
-        document.removeEventListener('message', onmessage)
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         /* empty */
       }
     }
-  }
-  document.addEventListener('message', onmessage)
+  })
+}
 
+const registerCallback = <T>(resolve: (value: T) => void, reject: (reason?: any) => void) => {
+  const id = `jsCallBack${cbId++}`
+  cbMap.set(id, { resolve, reject })
   return id
 }
 
 function invoke(method: string, params?: any) {
+  setupOnmessage()
   // @ts-ignore
   window.ReactNativeWebView.postMessage(JSON.stringify({ method, params }))
 }
 
 function invokeWithResult<T>(method: string, params?: any) {
+  setupOnmessage()
   return new Promise<T>((resolve, reject) => {
     // if (isReady()) {
     const cbId = registerCallback(resolve, reject)
